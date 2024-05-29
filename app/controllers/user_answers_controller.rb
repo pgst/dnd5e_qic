@@ -94,7 +94,9 @@ class UserAnswersController < ApplicationController
     end
   end
 
+  # 答案を提出するかここで確認
   def submit
+    @id_first = UserAnswer.where(user_id: session[:user_id], question_num: 1..).minimum(:id)
   end
 
   def results

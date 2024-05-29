@@ -1,2 +1,19 @@
-<h1>UserAnswers#submit</h1>
-<p>Find me in app/views/user_answers/submit.html.erb</p>
+<!-- 提出確認 -->
+<section class="py-5 bg-body-tertiary" id="">
+  <div class="container text-center pb-3">
+    <!-- 提出？ -->
+    <h1 class="pb-3">答案を提出しますか？</h1>
+
+    <div class="row">
+      <div class="d-grid gap-2 mx-auto">
+        <%= link_to "問題に戻る",  edit_user_answer_path(@id_first), class: 'btn btn-primary mt-5' %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="d-grid gap-2 mx-auto">
+        <%= link_to "答案を提出",  user_answers_results_path, class: 'btn btn-danger mt-5' %>
+      </div>
+    </div>
+  </div>
+</section>
