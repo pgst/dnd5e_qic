@@ -1,29 +1,6 @@
 RailsAdmin.config do |config|
   config.asset_source = :sprockets
 
-  ### Popular gems integration
-
-  ## == Devise ==
-  # config.authenticate_with do
-  #   warden.authenticate! scope: :user
-  # end
-  # config.current_user_method(&:current_user)
-
-  ## == CancanCan ==
-  # config.authorize_with :cancancan
-
-  ## == Pundit ==
-  # config.authorize_with :pundit
-
-  ## == PaperTrail ==
-  # config.audit_with :paper_trail, 'User', 'PaperTrail::Version' # PaperTrail >= 3.0.0
-
-  ### More at https://github.com/railsadminteam/rails_admin/wiki/Base-configuration
-
-  ## == Gravatar integration ==
-  ## To disable Gravatar integration in Navigation Bar set to false
-  # config.show_gravatar = true
-
   config.actions do
     dashboard                     # mandatory
     index                         # mandatory
@@ -34,9 +11,15 @@ RailsAdmin.config do |config|
     edit
     delete
     show_in_app
+  end
 
-    ## With an audit adapter, you can add:
-    # history_index
-    # history_show
+  # UserモデルとExaminationモデルとUserAnswerモデルを管理画面に表示
+  config.included_models = ['User', "Examination", "UserAnswer"]
+
+  # BASIC認証を設定
+  config.authenticate_with do
+    authenticate_or_request_with_http_basic('Site Message') do |username, password|
+      username == ENV['BASIC_AUTH_USERNAME'] && password == ENV['BASIC_AUTH_PASSWORD']
+    end
   end
 end
