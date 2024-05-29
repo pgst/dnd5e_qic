@@ -68,7 +68,30 @@ class UserAnswersController < ApplicationController
     @choiced_ans_no = @user_answer.choiced_ans == 'no' ? true : false
   end
 
+  # 回答欄テーブルのchoiced_ansカラムの更新
   def update
+    @user_answer = UserAnswer.find(params[:id])
+    if params[:user_answer] == nil
+      flash.now[:error] = '「はい」か「いいえ」のどちらかを選択してください。'
+      render :edit  # 同じ問題番号の画面を再表示
+      return
+    end
+    @user_answer.choiced_ans = params[:user_answer][:choiced_ans]
+
+    begin
+      if @user_answer.save  # 保存に成功した場合
+        question_num_all = UserAnswer.where(user_id: session[:user_id]).maximum(:question_num)
+        if @user_answer.question_num == question_num_all  # 最終問題の場合
+          flash[:notice] = '回答が完了したら、提出してください。'
+          redirect_to user_answers_submit_path  # 提出確認画面へ
+        else  # 最終問題でない場合
+          redirect_to edit_user_answer_path(@user_answer.id + 1)  # 次の問題へ
+        end
+      end
+    rescue ActiveRecord::RecordInvalid => e
+      flash.now[:error] = e.record.errors.full_messages
+      render :edit  # 同じ問題番号の画面を再表示
+    end
   end
 
   def submit
