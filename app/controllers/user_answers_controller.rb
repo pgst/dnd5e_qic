@@ -1,3 +1,8 @@
+################################
+# 次の段階では、                #
+# ファットコントローラを解消して #
+# コントローラの役割をシンプルに #
+################################
 class UserAnswersController < ApplicationController
   # 回答欄テーブルのデータ作成準備
   def new
@@ -7,7 +12,47 @@ class UserAnswersController < ApplicationController
     @question_num_all = 10
   end
 
+  # 回答欄テーブルのデータ作成とレコード保存
   def create
+    # 全問題データを取得
+    @questions = Examination.all
+    # セッションユーザーのIDを取得
+    user_id = session[:user_id]
+    # セッションユーザーの受験回数を取得
+    attempts_num = UserAnswer.where(user_id: user_id).maximum(:attempts_num)
+    # 初回受験時はnilのため0を代入
+    attempts_num ||= 0
+    # 問題数
+    question_num_all = params[:question_num_all].to_i
+
+    # 回答欄テーブルからセッションユーザーの、clearedがnilでquestion_numが1以上のレコードを取得
+    user_answers = UserAnswer.where(user_id: user_id, cleared: nil, question_num: 1..).order(:question_num)
+    if user_answers.present?
+      flash[:notice] = '答案提出前の問題があります。回答してください。'
+      redirect_to edit_user_answer_path(user_answers.first.id)
+    else  # なければ、以下の処理を実行
+      # 使用可能な問題のIDをランダムにquestion_num_all個取得
+      examination_ids_rand = Examination.where(can_use: true).order("RANDOM()").limit(question_num_all).pluck(:id)
+      user_answers = []
+      question_num_all.times do |i|
+        user_answer = UserAnswer.new
+        user_answer.user_id = user_id
+        user_answer.examination_id = examination_ids_rand[i]
+        user_answer.attempts_num = attempts_num + 1
+        user_answer.question_num = i + 1
+        user_answers << user_answer
+      end
+
+      begin
+        if user_answers.all?(&:save!)
+          flash[:notice] = '問題の準備ができました。回答してください。'
+          redirect_to edit_user_answer_path(user_answers.first.id)
+        end
+      rescue ActiveRecord::RecordInvalid => e
+        flash.now[:error] << e.record.errors.full_messages
+        render :new
+      end
+    end
   end
 
   def edit
