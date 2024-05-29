@@ -1,2 +1,68 @@
-<h1>UserAnswers#edit</h1>
-<p>Find me in app/views/user_answers/edit.html.erb</p>
+<!-- 問題 -->
+<section class="py-5 bg-body-tertiary" id="">
+  <div class="container text-center pb-3">
+    <!-- 何問目か表示 -->
+    <h1 class="pb-3"><%= "第#{@user_answer.question_num}問目" %></h1>
+
+    <!-- 文章 -->
+    <div class="row pb-3 text-start">
+      <div class="col">
+        <h4><%= @user_answer.examination.question_txt %></h4>
+      </div>
+    </div>
+
+    <!-- 回答 -->
+    <div class="row">
+      <%= form_with(model: @user_answer, url: user_answer_path(@user_answer), method: :patch, local: true) do |form| %>
+        <div class="d-flex align-items-center justify-content-center">
+          <div class="me-4 w-100">
+            <%= form.radio_button :choiced_ans, 'yes', class: 'd-none', id: 'radio_yes', checked: @choiced_ans_yes %>
+            <%= label_tag :radio_yes, 'はい', class: 'btn btn-outline-primary btn-lg w-100' %>
+          </div>
+          <div class="ms-4 w-100">
+            <%= form.radio_button :choiced_ans, 'no', class: 'd-none', id: 'radio_no', checked: @choiced_ans_no %>
+            <%= label_tag :radio_no, 'いいえ', class: 'btn btn-outline-primary btn-lg w-100' %>
+          </div>
+        </div>
+        <div class="d-grid gap-2 mx-auto">
+          <%= form.submit '次へ進む', class: 'btn btn-danger mt-5' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<!-- このスクリプトは、user_answers/edit.html.erbでのみ読み込むこと -->
+<script>
+  $(document).ready(function() {
+    const radioYes = $('#radio_yes');
+    const radioNo = $('#radio_no');
+    const labelYes = $('label[for="radio_yes"]');
+    const labelNo = $('label[for="radio_no"]');
+
+    // 初期状態の設定
+    if (radioYes.prop('checked')) {
+      labelYes.removeClass('btn-outline-primary');
+      labelYes.addClass('btn-primary');
+    } else if (radioNo.prop('checked')) {
+      labelNo.removeClass('btn-outline-primary');
+      labelNo.addClass('btn-primary');
+    }
+
+    // ラジオボタンyesがクリックされた時の処理
+    radioYes.on('click', function() {
+      labelYes.removeClass('btn-outline-primary');
+      labelYes.addClass('btn-primary');
+      labelNo.removeClass('btn-primary');
+      labelNo.addClass('btn-outline-primary');
+    });
+
+    // ラジオボタンnoがクリックされた時の処理
+    radioNo.on('click', function() {
+      labelNo.removeClass('btn-outline-primary');
+      labelNo.addClass('btn-primary');
+      labelYes.removeClass('btn-primary');
+      labelYes.addClass('btn-outline-primary');
+    });
+  });
+  </script>
