@@ -7,5 +7,7 @@ Rails.application.routes.draw do
   get 'log_out', to: 'sessions#destroy', as: 'log_out'
   resources :sessions, only: %i[create destroy]
 
-  # get 'home/index', to: 'home#index'
+  get 'user_answers/submit', to: 'user_answers#submit'
+  get 'user_answers/results', to: 'user_answers#results'
+  resources :user_answers, only: %i[new create edit update index]
 end
