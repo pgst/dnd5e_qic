@@ -1,2 +1,28 @@
-<h1>UserAnswers#new</h1>
-<p>Find me in app/views/user_answers/new.html.erb</p>
+<!-- D&D第5版PL検定 -->
+<section class="py-5 bg-body-tertiary" id="exam">
+  <div class="container text-center pb-3">
+    <div class="row">
+      <div class="col">
+        <h2 class="mb-3">D&D第5版PL試験</h2>
+        <p>
+          プレイヤーとしてのルール理解度を確認するため、<br />
+          「<%= link_to 'フィフスエディションRPG', 'https://wit-awscms-witweb.s3-ap-northeast-1.amazonaws.com/hjcardgamer/5eRPG_Core_20240315.pdf', target: '_blank' %>」のPDFファイルをもとに、<br />
+          「はい」or「いいえ」で回答できる問題を用意しました。
+        </p>
+        <p>
+          現在のところ、問題数は全<%= @examination_count %>問です。<br />
+          その中から<%= @question_num_all %>問がランダムに出題されます。<br />
+          <%= (@question_num_all * 0.65).ceil %>問以上の正解で合格です。
+        </p>
+        <div class="d-grid gap-2 mx-auto">
+          <%= form_with(url: user_answers_path, method: :post, local: true) do |form| %>
+            <%= form.hidden_field :question_num_all, value: @question_num_all %>
+            <div class="d-grid gap-2 mx-auto">
+              <%= form.submit 'スタート！', class: 'btn btn-danger mt-5' %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
