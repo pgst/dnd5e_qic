@@ -14,7 +14,7 @@
           <i class="bi bi-dice-1 text-info fs-1"></i>
           <h5>D&D第5版PL試験</h5>
           <p class="text-body-secondary">D&Dのプレイヤーとしての知識を試す試験です。</p>
-          <a></a>
+          <%= link_to "詳細はこちら",  { controller: 'user_answers', action: 'new' }, class: 'btn btn-info rounded-pill text-white' %>
         </div>
       </div>
 
@@ -24,7 +24,7 @@
           <i class="bi bi-dice-2 text-info fs-1"></i>
           <h5>過去問の確認</h5>
           <p class="text-body-secondary">過去の試験結果を確認できる予定です。</p>
-          <a></a>
+          <%= link_to "未定",  { controller: 'user_answers', action: 'index' }, class: 'btn btn-info rounded-pill text-white' %>
         </div>
       </div>
     </div>
