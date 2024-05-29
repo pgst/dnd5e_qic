@@ -25,8 +25,8 @@ class UserAnswersController < ApplicationController
     # 問題数
     question_num_all = params[:question_num_all].to_i
 
-    # 回答欄テーブルからセッションユーザーの、clearedがnilでquestion_numが1以上のレコードを取得
-    user_answers = UserAnswer.where(user_id: user_id, cleared: nil, question_num: 1..).order(:question_num)
+    # 回答欄テーブルからセッションユーザーのquestion_numが1以上のレコードを取得
+    user_answers = UserAnswer.where(user_id: user_id, question_num: 1..).order(:question_num)
     if user_answers.present?
       flash[:notice] = '答案提出前の問題があります。回答してください。'
       redirect_to edit_user_answer_path(user_answers.first.id)
@@ -94,12 +94,34 @@ class UserAnswersController < ApplicationController
     end
   end
 
-  # 答案を提出するかここで確認
+  # ここで答案を提出するか確認
   def submit
     @id_first = UserAnswer.where(user_id: session[:user_id], question_num: 1..).minimum(:id)
   end
 
+  # ここで合否判定を行う
   def results
+    user_answers = UserAnswer.includes(:examination).where(user_id: session[:user_id], question_num: 1..).order(:question_num)
+    @correct_num = 0
+    user_answers.each do |ua|
+      if ua.choiced_ans == ua.examination.correct_ans
+        ua.cleared = true
+        @correct_num += 1
+      else
+        ua.cleared = false
+      end
+      ua.question_num = 0
+      unless ua.save
+        render :submit  # 提出画面を再表示
+      end
+    end
+    question_num_all = user_answers.length
+    if question_num_all > 0 && (question_num_all * 0.65).ceil <= @correct_num  # 正答率が65%以上の場合
+      @passed = true
+      User.find(session[:user_id]).increment!(:passed_num)
+    else
+      @passed = false
+    end
   end
 
   def index
