@@ -24,6 +24,69 @@
   </head>
 
   <body class="">
+    <!-- ナビゲーションバー -->
+    <nav
+      class="navbar navbar-expand-lg bg-secondary fixed-top"
+      data-bs-theme="dark"
+      id="navbar"
+    >
+      <!-- ブランド -->
+      <div class="ms-2 me-auto">
+        <a class="navbar-brand" href="/">
+          <i class="bi bi-magic text-danger"></i> DnD5e向上委員会
+        </a>
+      </div>
+
+      <!-- トグルボタン -->
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- リンク一覧 -->
+      <div class="collapse navbar-collapse ms-5" id="navbarNav">
+        <!-- テキストの折り返し対策のため、スタイルを追加 -->
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <%= link_to 'ホーム', root_path, class: current_page?(root_path) ? 'nav-link active' : 'nav-link' %>
+          </li>
+          <li class="nav-item">
+            <%= link_to '試験', new_user_answer_path, class: current_page?(new_user_answer_path) ? 'nav-link active' : 'nav-link' %>
+          </li>
+          <li class="nav-item">
+            <%= link_to '過去問', user_answers_path, class: current_page?(user_answers_path) ? 'nav-link active' : 'nav-link' %>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- ヘッダー -->
+    <header class="bg-body-tertiary mt-5 pt-3">
+    <% if flash.any? %>
+      <% flash.each do |type, message| %>
+        <% if type == 'notice' %>
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= message %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% elsif type == 'error' %>
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= message %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% else %>
+          <div class="alert alert-<%= type %> alert-dismissible fade show" role="alert">
+            <%= message %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+    </header>
 
     <%= yield %>
 
