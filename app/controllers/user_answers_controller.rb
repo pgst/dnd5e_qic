@@ -4,6 +4,8 @@
 # コントローラの役割をシンプルに #
 ################################
 class UserAnswersController < ApplicationController
+  before_action :set_no_cache
+
   # 回答欄テーブルのデータ作成準備
   def new
     # 試験問題テーブルの使用可能な全問題数を取得
@@ -124,9 +126,13 @@ class UserAnswersController < ApplicationController
     end
   end
 
+  # 回答欄テーブルのレコード一覧を表示（予定）
   def index
   end
 
-  def show
+  private
+
+  def set_no_cache
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
   end
 end
