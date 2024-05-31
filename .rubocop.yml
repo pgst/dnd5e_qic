@@ -1,0 +1,7 @@
+# rubocop_todo.ymlに書いてある内容はルール違反してても無視
+inherit_from: .rubocop_todo.yml
+
+# ここはGemfileで設定した部分
+require:
+  - rubocop-performance
+  - rubocop-rails
