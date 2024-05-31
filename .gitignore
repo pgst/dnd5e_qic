@@ -33,3 +33,7 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+
+# Ignore custom
+/参考資料
