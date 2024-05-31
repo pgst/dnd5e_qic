@@ -16,9 +16,11 @@ examinations_csv.each do |row|
   )
 end
 
-users_csv = CSV.read('db/users.csv', headers: false)
+users_csv = CSV.read('db/users.csv', headers: true)
 users_csv.each do |row|
   admin = row[5] == 'true' ? true : false
+  created_at = row[6] == '' ? Time.current : row[6]
+  updated_at = row[7] == '' ? Time.current : row[7]
 
   User.create!(
     id: row[0],
@@ -26,7 +28,9 @@ users_csv.each do |row|
     image: row[2],
     uid: row[3],
     passed_num: row[4],
-    admin: admin
+    admin: admin,
+    created_at: created_at,
+    updated_at: updated_at
   )
 end
 
