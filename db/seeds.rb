@@ -1,14 +1,18 @@
 require 'csv'
 
-examinations_csv = CSV.read('db/examinations.csv', headers: false)
+examinations_csv = CSV.read('db/examinations.csv', headers: true)
 examinations_csv.each do |row|
   can_use = row[3] == 'true' ? true : false
+  created_at = row[4] == '' ? Time.current : row[4]
+  updated_at = row[5] == '' ? Time.current : row[5]
 
   Examination.create!(
     id: row[0],
     question_txt: row[1],
     correct_ans: row[2],
-    can_use: can_use
+    can_use: can_use,
+    created_at: created_at,
+    updated_at: updated_at
   )
 end
 
