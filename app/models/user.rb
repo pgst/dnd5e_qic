@@ -1,6 +1,5 @@
 class User < ApplicationRecord
   has_many :user_answers
-  after_create :set_admin_for_first_user
 
   class << self
     def find_or_create_from_auth_hash(auth_hash)
@@ -19,13 +18,5 @@ class User < ApplicationRecord
         uid:   auth_hash.uid
       }
     end
-  end
-
-  private
-
-  # 最初のユーザーを管理者にする
-  def set_admin_for_first_user
-    self.admin = true if self.id == 1
-    self.save
   end
 end
