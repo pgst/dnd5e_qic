@@ -11,7 +11,9 @@ class UserAnswersController < ApplicationController
     # 試験問題テーブルの使用可能な全問題数を取得
     @examination_count = Examination.where(can_use: true).pluck(:id).size
     # 問題数の初期値を設定
-    @question_num_all = 10
+    @question_num_all = ENV['QUESTION_NUM_ALL'].to_i
+    # 合格の最低点数を設定
+    @passing_score_threshold = (@question_num_all * ENV['PASSING_SCORE_THRESHOLD'].to_i / 100).ceil
   end
 
   # 回答欄テーブルのデータ作成とレコード保存
