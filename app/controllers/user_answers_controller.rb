@@ -9,7 +9,7 @@ class UserAnswersController < ApplicationController
   # 回答欄テーブルのデータ作成準備
   def new
     # 試験問題テーブルの使用可能な全問題数を取得
-    @examination_count = Examination.where(can_use: true).pluck(:id).size
+    @examination_count = Examination.get_examination_count
     # 問題数の初期値を設定
     @question_num_all = ENV['QUESTION_NUM_ALL'].to_i
     # 合格の最低点数を設定
@@ -18,21 +18,17 @@ class UserAnswersController < ApplicationController
 
   # 回答欄テーブルのデータ作成とレコード保存
   def create
-    # 全問題データを取得
-    @questions = Examination.all
-    # セッションユーザーのIDを取得
+    # セッションユーザーのID
     user_id = session[:user_id]
-    # セッションユーザーの受験回数を取得
-    attempts_num = UserAnswer.where(user_id: user_id).maximum(:attempts_num)
-    # 初回受験時はnilのため0を代入
-    attempts_num ||= 0
     # 問題数
     question_num_all = params[:question_num_all].to_i
+    # 解答欄テーブルからセッションユーザーの受験回数を取得
+    attempts_num = UserAnswer.get_attempts_num(user_id)
 
     # 回答欄テーブルからセッションユーザーのquestion_numが1以上のレコードを取得
     user_answers = UserAnswer.where(user_id: user_id, question_num: 1..).order(:question_num)
     if user_answers.present?
-      flash[:notice] = '答案提出前の問題があります。回答してください。'
+      flash[:notice] = '答案提出前の問題があります。再表示しますので回答してください。'
       redirect_to edit_user_answer_path(user_answers.first.id)
     else  # なければ、以下の処理を実行
       # 使用可能な問題のIDをランダムにquestion_num_all個取得
