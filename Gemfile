@@ -51,9 +51,9 @@ group :development do
   # gem "spring"
 
   # 今回のapp用に追加
-  gem 'rubocop', require: false # 追加
-  gem 'rubocop-performance', require: false # 追加
-  gem 'rubocop-rails', require: false # 追加
+  # gem 'rubocop', require: false # 追加
+  # gem 'rubocop-performance', require: false # 追加
+  # gem 'rubocop-rails', require: false # 追加
 end
 
 group :test do

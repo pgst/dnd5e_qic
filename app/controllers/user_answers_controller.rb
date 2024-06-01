@@ -1,6 +1,5 @@
 ################################
 # 次の段階では、                #
-# ファットコントローラを解消して #
 # コントローラの役割をシンプルに #
 ################################
 class UserAnswersController < ApplicationController
@@ -24,30 +23,22 @@ class UserAnswersController < ApplicationController
     question_num_all = params[:question_num_all].to_i
     # 解答欄テーブルからセッションユーザーの受験回数を取得
     attempts_num = UserAnswer.get_attempts_num(user_id)
-
     # 回答欄テーブルからセッションユーザーのquestion_numが1以上のレコードを取得
-    user_answers = UserAnswer.where(user_id: user_id, question_num: 1..).order(:question_num)
+    user_answers = UserAnswer.get_user_answers(user_id)
+
+    # 提出前のレコードの有無を確認
     if user_answers.present?
+      # 通知
       flash[:notice] = '答案提出前の問題があります。再表示しますので回答してください。'
       redirect_to edit_user_answer_path(user_answers.first.id)
-    else  # なければ、以下の処理を実行
+    else
       # 使用可能な問題のIDをランダムにquestion_num_all個取得
-      examination_ids_rand = Examination.where(can_use: true).order("RANDOM()").limit(question_num_all).pluck(:id)
-      user_answers = []
-      question_num_all.times do |i|
-        user_answer = UserAnswer.new
-        user_answer.user_id = user_id
-        user_answer.examination_id = examination_ids_rand[i]
-        user_answer.attempts_num = attempts_num + 1
-        user_answer.question_num = i + 1
-        user_answers << user_answer
-      end
+      examination_ids_rand = Examination.get_examination_ids_rand(question_num_all)
+      # 回答欄データを作成して保存
+      user_answers = UserAnswer.set_user_answers(examination_ids_rand, user_id, attempts_num)
 
       begin
-        if user_answers.all?(&:save!)
-          flash[:notice] = '問題の準備ができました。回答してください。'
-          redirect_to edit_user_answer_path(user_answers.first.id)
-        end
+        redirect_to edit_user_answer_path(user_answers.first.id) if user_answers.all?(&:save!)
       rescue ActiveRecord::RecordInvalid => e
         flash.now[:error] << e.record.errors.full_messages
         render :new
@@ -97,6 +88,7 @@ class UserAnswersController < ApplicationController
   # ここで答案を提出するか確認
   def submit
     @id_first = UserAnswer.where(user_id: session[:user_id], question_num: 1..).minimum(:id)
+    # user_answers_results_pathから戻るボタン等で戻った時のエラー処理が必要
   end
 
   # ここで合否判定を行う
