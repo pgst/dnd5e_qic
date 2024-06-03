@@ -48,7 +48,7 @@ class UserAnswer < ApplicationRecord
       return 0, false, false unless ua.save
     end
 
-    if user_answers.size > 0 && (user_answers.size * ENV['PASSING_SCORE_THRESHOLD'].to_i / 100).ceil <= correct_num  # 正答率が65%以上の場合
+    if user_answers.size > 0 && Float(user_answers.size * ENV['PASSING_SCORE_THRESHOLD'].to_f / 100) <= Float(correct_num)
       passed = true
       User.find(id).increment!(:passed_num)
     else

@@ -12,7 +12,7 @@ class UserAnswersController < ApplicationController
     # 問題数の初期値を設定
     @question_num_all = ENV['QUESTION_NUM_ALL'].to_i
     # 合格の最低点数を設定
-    @passing_score_threshold = (@question_num_all * ENV['PASSING_SCORE_THRESHOLD'].to_i / 100).ceil
+    @passing_score_threshold = (@question_num_all * ENV['PASSING_SCORE_THRESHOLD'].to_f / 100).ceil
   end
 
   # 回答欄テーブルのデータ作成とレコード保存
@@ -24,7 +24,7 @@ class UserAnswersController < ApplicationController
     # 解答欄テーブルからセッションユーザーの受験回数を取得
     attempts_num = UserAnswer.get_attempts_num(user_id)
     # 初回受験時ならば空なので0を代入
-    attempts_num = 0 if attempts_num.empty?
+    attempts_num = 0 if !attempts_num.is_a?(Numeric)
 
     # 提出前のレコードの有無を確認
     user_answers = UserAnswer.get_user_answers(user_id)
