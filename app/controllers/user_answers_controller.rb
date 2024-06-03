@@ -94,27 +94,8 @@ class UserAnswersController < ApplicationController
 
   # ここで合否判定を行う
   def results
-    user_answers = UserAnswer.includes(:examination).where(user_id: session[:user_id], question_num: 1..).order(:question_num)
-    @correct_num = 0
-    user_answers.each do |ua|
-      if ua.choiced_ans == ua.examination.correct_ans
-        ua.cleared = true
-        @correct_num += 1
-      else
-        ua.cleared = false
-      end
-      ua.question_num = 0
-      unless ua.save
-        render :submit  # 提出画面を再表示
-      end
-    end
-    question_num_all = user_answers.length
-    if question_num_all > 0 && (question_num_all * 0.65).ceil <= @correct_num  # 正答率が65%以上の場合
-      @passed = true
-      User.find(session[:user_id]).increment!(:passed_num)
-    else
-      @passed = false
-    end
+    @correct_num, @passed, is_saved = UserAnswer.results(session[:user_id])
+    render :submit unless is_saved  # 保存に失敗してたら、提出画面を再表示
   end
 
   # 回答欄テーブルのレコード一覧を表示（予定）

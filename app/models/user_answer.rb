@@ -42,4 +42,31 @@ class UserAnswer < ApplicationRecord
   def self.get_id_first(id)
     where(user_id: id, question_num: 1..).minimum(:id)
   end
+
+  # 合否判定を行って結果を返す
+  def self.results(id)
+    user_answers = includes(:examination).where(user_id: id, question_num: 1..).order(:question_num)
+
+    correct_num = 0
+    user_answers.each do |ua|
+      if ua.choiced_ans == ua.examination.correct_ans
+        ua.cleared = true
+        correct_num += 1
+      else
+        ua.cleared = false
+      end
+
+      ua.question_num = 0
+      return 0, false, false unless ua.save
+    end
+
+    if user_answers.size > 0 && (user_answers.size * ENV['PASSING_SCORE_THRESHOLD'].to_i / 100).ceil <= correct_num  # 正答率が65%以上の場合
+      passed = true
+      User.find(id).increment!(:passed_num)
+    else
+      passed = false
+    end
+
+    return correct_num, passed, true
+  end
 end
