@@ -87,7 +87,8 @@ class UserAnswersController < ApplicationController
 
   # ここで答案を提出するか確認
   def submit
-    @id_first = UserAnswer.where(user_id: session[:user_id], question_num: 1..).minimum(:id)
+    # 問題の先頭番号を取得
+    @id_first = UserAnswer.get_id_first(session[:user_id])
     # user_answers_results_pathから戻るボタン等で戻った時のエラー処理が必要
   end
 

@@ -37,4 +37,9 @@ class UserAnswer < ApplicationRecord
   def self.get_question_num_all(id, num)
     where(user_id: id).maximum(num)
   end
+
+  # ユーザーのquestion_numが1以上のレコードの中で最小のidを取得
+  def self.get_id_first(id)
+    where(user_id: id, question_num: 1..).minimum(:id)
+  end
 end
