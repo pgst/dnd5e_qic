@@ -14,7 +14,10 @@ class UserAnswer < ApplicationRecord
   scope :get_attempts_num, ->(user_id) { where(user_id:).maximum(:attempts_num) }
 
   # 回答欄データを作成して保存
-  def self.set_user_answers(examination_ids_rand, user_id, attempts_num)
+  def self.set_user_answers(question_num_all, user_id, attempts_num)
+    # 使用可能な問題のIDをランダムにquestion_num_all個取得
+    examination_ids_rand = Examination.get_examination_ids_rand(question_num_all)
+
     user_answers = []
     examination_ids_rand.size.times do |i|
       user_answer = UserAnswer.new
@@ -24,6 +27,7 @@ class UserAnswer < ApplicationRecord
       user_answer.question_num = i + 1
       user_answers << user_answer
     end
+
     user_answers
   end
 

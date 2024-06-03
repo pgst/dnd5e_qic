@@ -23,21 +23,18 @@ class UserAnswersController < ApplicationController
     question_num_all = params[:question_num_all].to_i
     # 解答欄テーブルからセッションユーザーの受験回数を取得
     attempts_num = UserAnswer.get_attempts_num(user_id)
-    # 初回受験時ならばnilなので0を代入
-    attempts_num ||= 0
-    # 回答欄テーブルからセッションユーザーのquestion_numが1以上のレコードを取得
-    user_answers = UserAnswer.get_user_answers(user_id)
+    # 初回受験時ならば空なので0を代入
+    attempts_num = 0 if attempts_num.empty?
 
     # 提出前のレコードの有無を確認
+    user_answers = UserAnswer.get_user_answers(user_id)
     if user_answers.present?
       # 通知
       flash[:notice] = '答案提出前の問題があります。再表示しますので回答してください。'
       redirect_to edit_user_answer_path(user_answers.first.id)
     else
-      # 使用可能な問題のIDをランダムにquestion_num_all個取得
-      examination_ids_rand = Examination.get_examination_ids_rand(question_num_all)
       # 回答欄データを作成して保存
-      user_answers = UserAnswer.set_user_answers(examination_ids_rand, user_id, attempts_num)
+      user_answers = UserAnswer.set_user_answers(question_num_all, user_id, attempts_num)
 
       begin
         redirect_to edit_user_answer_path(user_answers.first.id) if user_answers.all?(&:save!)
