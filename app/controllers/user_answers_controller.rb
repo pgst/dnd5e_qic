@@ -61,7 +61,7 @@ class UserAnswersController < ApplicationController
 
   # 回答欄テーブルのchoiced_ansカラムの更新
   def update
-    @user_answer = UserAnswer.find(params[:id])
+    @user_answer = UserAnswer.get_user_answer(params[:id])
     if params[:user_answer] == nil
       flash.now[:error] = '「はい」か「いいえ」のどちらかを選択してください。'
       render :edit  # 同じ問題番号の画面を再表示
@@ -71,8 +71,8 @@ class UserAnswersController < ApplicationController
 
     begin
       if @user_answer.save  # 保存に成功した場合
-        question_num_all = UserAnswer.where(user_id: session[:user_id]).maximum(:question_num)
-        if @user_answer.question_num == question_num_all  # 最終問題の場合
+        question_num_max = UserAnswer.get_question_num_all(session[:user_id], :question_num)
+        if @user_answer.question_num == question_num_max  # 最大、すなわち最終問題の場合
           flash[:notice] = '回答が完了したら、提出してください。'
           redirect_to user_answers_submit_path  # 提出確認画面へ
         else  # 最終問題でない場合

@@ -32,4 +32,9 @@ class UserAnswer < ApplicationRecord
     end
     user_answers
   end
+
+  # ユーザーのquestion_numの最大値を取得
+  def self.get_question_num_all(id, num)
+    where(user_id: id).maximum(num)
+  end
 end
