@@ -1,7 +1,3 @@
-################################
-# 次の段階では、                #
-# コントローラの役割をシンプルに #
-################################
 class UserAnswersController < ApplicationController
   before_action :set_no_cache
 
@@ -23,8 +19,6 @@ class UserAnswersController < ApplicationController
     question_num_all = params[:question_num_all].to_i
     # 解答欄テーブルからセッションユーザーの受験回数を取得
     attempts_num = UserAnswer.get_attempts_num(user_id)
-    # 初回受験時ならば空なので0を代入
-    attempts_num = 0 if !attempts_num.is_a?(Numeric)
 
     # 提出前のレコードの有無を確認
     user_answers = UserAnswer.get_user_answers(user_id)
@@ -70,8 +64,8 @@ class UserAnswersController < ApplicationController
 
     begin
       if @user_answer.save  # 保存に成功した場合
-        question_num_max = UserAnswer.get_question_num_all(session[:user_id], :question_num)
-        if @user_answer.question_num == question_num_max  # 最大、すなわち最終問題の場合
+        # 最大、すなわち最終問題か
+        if @user_answer.question_num == UserAnswer.get_question_num_all(session[:user_id], :question_num)
           flash[:notice] = '回答が完了したら、提出してください。'
           redirect_to user_answers_submit_path  # 提出確認画面へ
         else  # 最終問題でない場合

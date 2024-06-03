@@ -10,11 +10,15 @@ class UserAnswer < ApplicationRecord
   scope :get_question_num_all, ->(id, num) { where(user_id: id).maximum(num) }
   # ユーザーのquestion_numが1以上のレコードの中で最小のidを取得
   scope :get_id_first, ->(id) { where(user_id: id, question_num: 1..).minimum(:id) }
+
   # 受験回数を取得
-  scope :get_attempts_num, ->(user_id) { where(user_id:).maximum(:attempts_num) }
+  scope :get_attempts_num, ->(user_id) do
+    # 初回受験時ならばnilなので0を返す
+    where(user_id:).maximum(:attempts_num) || 0
+  end
 
   # 回答欄データを作成して保存
-  def self.set_user_answers(question_num_all, user_id, attempts_num)
+  scope :set_user_answers, ->(question_num_all, user_id, attempts_num) do
     # 使用可能な問題のIDをランダムにquestion_num_all個取得
     examination_ids_rand = Examination.get_examination_ids_rand(question_num_all)
 
@@ -31,8 +35,8 @@ class UserAnswer < ApplicationRecord
     user_answers
   end
 
-  # 合否判定を行って結果を返す
-  def self.results(id)
+  # 合否判定して、正解数と合否結果と保存の成否を返す
+  scope :results, ->(id) do
     user_answers = includes(:examination).where(user_id: id, question_num: 1..).order(:question_num)
 
     correct_num = 0
@@ -45,7 +49,7 @@ class UserAnswer < ApplicationRecord
       end
 
       ua.question_num = 0
-      return 0, false, false unless ua.save
+      return 0, false, false if !ua.save
     end
 
     if user_answers.size > 0 && Float(user_answers.size * ENV['PASSING_SCORE_THRESHOLD'].to_f / 100) <= Float(correct_num)
