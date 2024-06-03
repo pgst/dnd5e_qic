@@ -48,7 +48,7 @@ class UserAnswersController < ApplicationController
 
   # 回答欄テーブルのchoiced_ansカラムの更新準備
   def edit
-    @user_answer = UserAnswer.find(params[:id])
+    @user_answer = UserAnswer.get_user_answer(params[:id])
 
     # セッションユーザーと回答者が異なる場合、トップページへリダイレクト
     flash.now[:error] = '他のユーザーの回答は編集できません。'if @user_answer.user_id != session[:user_id]

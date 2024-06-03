@@ -14,6 +14,11 @@ class UserAnswer < ApplicationRecord
     where(user_id:, question_num: 1..).order(:question_num)
   end
 
+  # 指定したidのレコードを取得
+  def self.get_user_answer(id)
+    find(id)
+  end
+
   # 回答欄データを作成して保存
   def self.set_user_answers(examination_ids_rand, user_id, attempts_num)
     user_answers = []
@@ -25,12 +30,6 @@ class UserAnswer < ApplicationRecord
       user_answer.question_num = i + 1
       user_answers << user_answer
     end
-    puts ''
-    puts '----------------------------------'
-    puts 'user_answers.sizeは以下の通りです。'
-    puts "| #{user_answers.size} |"
-    puts '----------------------------------'
-    puts ''
     user_answers
   end
 end
