@@ -2,22 +2,16 @@ class UserAnswer < ApplicationRecord
   belongs_to :user
   belongs_to :examination
 
-  # 受験回数を取得
-  def self.get_attempts_num(user_id)
-    attempts_num = where(user_id:).maximum(:attempts_num)
-    # 初回受験時はnilのため0を代入
-    attempts_num ||= 0
-  end
-
   # ユーザーのquestion_numが1以上のレコードを取得
-  def self.get_user_answers(user_id)
-    where(user_id:, question_num: 1..).order(:question_num)
-  end
-
+  scope :get_user_answers, ->(user_id) { where(user_id:, question_num: 1..).order(:question_num) }
   # 指定したidのレコードを取得
-  def self.get_user_answer(id)
-    find(id)
-  end
+  scope :get_user_answer, ->(id) { find(id) }
+  # ユーザーのquestion_numの最大値を取得
+  scope :get_question_num_all, ->(id, num) { where(user_id: id).maximum(num) }
+  # ユーザーのquestion_numが1以上のレコードの中で最小のidを取得
+  scope :get_id_first, ->(id) { where(user_id: id, question_num: 1..).minimum(:id) }
+  # 受験回数を取得
+  scope :get_attempts_num, ->(user_id) { where(user_id:).maximum(:attempts_num) }
 
   # 回答欄データを作成して保存
   def self.set_user_answers(examination_ids_rand, user_id, attempts_num)
@@ -31,16 +25,6 @@ class UserAnswer < ApplicationRecord
       user_answers << user_answer
     end
     user_answers
-  end
-
-  # ユーザーのquestion_numの最大値を取得
-  def self.get_question_num_all(id, num)
-    where(user_id: id).maximum(num)
-  end
-
-  # ユーザーのquestion_numが1以上のレコードの中で最小のidを取得
-  def self.get_id_first(id)
-    where(user_id: id, question_num: 1..).minimum(:id)
   end
 
   # 合否判定を行って結果を返す

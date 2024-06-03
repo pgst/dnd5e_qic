@@ -23,6 +23,8 @@ class UserAnswersController < ApplicationController
     question_num_all = params[:question_num_all].to_i
     # 解答欄テーブルからセッションユーザーの受験回数を取得
     attempts_num = UserAnswer.get_attempts_num(user_id)
+    # 初回受験時ならばnilなので0を代入
+    attempts_num ||= 0
     # 回答欄テーブルからセッションユーザーのquestion_numが1以上のレコードを取得
     user_answers = UserAnswer.get_user_answers(user_id)
 
