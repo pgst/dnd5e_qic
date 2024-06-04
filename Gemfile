@@ -51,9 +51,7 @@ group :development do
   # gem "spring"
 
   # 今回のapp用に追加
-  # gem 'rubocop', require: false # 追加
-  # gem 'rubocop-performance', require: false # 追加
-  # gem 'rubocop-rails', require: false # 追加
+  gem "pry-rails"
 end
 
 group :test do
@@ -67,8 +65,8 @@ gem "rails_admin", "~> 3.0"
 gem "rails-i18n"
 gem "omniauth"
 gem "omniauth-discord"
-gem 'omniauth-rails_csrf_protection'
-gem 'dotenv-rails'
+gem "omniauth-rails_csrf_protection"
+gem "dotenv-rails"
 # 以下二つは、rails_admin で必要
 gem "csv"
 gem "sassc-rails"
