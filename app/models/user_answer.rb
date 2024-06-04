@@ -77,4 +77,20 @@ class UserAnswer < ApplicationRecord
     @choiced_ans_no = self.choiced_ans == 'no'
     return @choiced_ans_yes, @choiced_ans_no
   end
+
+  # 最大すなわち、最終問題かを判定
+  def is_last_question?(user_id)
+    self.question_num == UserAnswer.get_question_num_all(user_id, :question_num)
+  end
+
+  # 回答した選択肢の更新
+  def update_choiced_ans(params)
+    self.choiced_ans = params[:choiced_ans]
+    begin
+      self.save!
+      return true, nil
+    rescue ActiveRecord::RecordInvalid => e
+      return false, e.record.errors.full_messages
+    end
+  end
 end

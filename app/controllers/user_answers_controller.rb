@@ -28,12 +28,12 @@ class UserAnswersController < ApplicationController
       redirect_to edit_user_answer_path(user_answers.first.id)
     else
       # 回答欄データを作成して保存
-      is_saved, first_id, e_message = UserAnswer.set_user_answers(question_num_all, user_id, attempts_num)
+      is_saved, first_id, e_messages = UserAnswer.set_user_answers(question_num_all, user_id, attempts_num)
 
       if is_saved
         redirect_to edit_user_answer_path(first_id)
       else
-        flash.now[:error] << e_message
+        flash.now[:error] << e_messages
         render :new
       end
     end
@@ -56,28 +56,28 @@ class UserAnswersController < ApplicationController
   # 回答欄テーブルのchoiced_ansカラムの更新
   def update
     @user_answer = UserAnswer.get_by_id(params[:id])
-    if params[:user_answer] == nil
+    if params[:user_answer].nil?
       flash.now[:error] = '「はい」か「いいえ」のどちらかを選択してください。'
       # 同じ問題番号の画面を再表示
       render :edit
       return
     end
-    @user_answer.choiced_ans = params[:user_answer][:choiced_ans]
 
-    begin
-      if @user_answer.save  # 保存に成功した場合
-        # 最大、すなわち最終問題かを確認
-        if @user_answer.question_num == UserAnswer.get_question_num_all(session[:user_id], :question_num)
-          flash[:notice] = '回答が完了したら提出してください。または、第1問目から選択しなおすこともできます。'
-          # 提出確認画面へ
-          redirect_to user_answers_submit_path
-        else  # 最終問題でない場合
-          # 次の問題へ
-          redirect_to edit_user_answer_path(@user_answer.id + 1)
-        end
+    is_saved, e_messages = @user_answer.update_choiced_ans(params[:user_answer])
+
+    if is_saved
+      # 最終問題かを確認
+      if @user_answer.is_last_question?(session[:user_id])
+        flash[:notice] = '回答が完了したら提出してください。または、第1問目から選択しなおすこともできます。'
+        # 提出確認画面へ
+        redirect_to user_answers_submit_path
+      else
+        # 最終問題でなければ次の問題へ
+        redirect_to edit_user_answer_path(@user_answer.id + 1)
       end
-    rescue ActiveRecord::RecordInvalid => e
-      flash.now[:error] = e.record.errors.full_messages
+    else
+      # 通知
+      flash.now[:error] << e_messages
       # 同じ問題番号の画面を再表示
       render :edit
     end
