@@ -28,12 +28,12 @@ class UserAnswersController < ApplicationController
       redirect_to edit_user_answer_path(user_answers.first.id)
     else
       # 回答欄データを作成して保存
-      user_answers = UserAnswer.set_user_answers(question_num_all, user_id, attempts_num)
+      is_saved, first_id, e_message = UserAnswer.set_user_answers(question_num_all, user_id, attempts_num)
 
-      begin
-        redirect_to edit_user_answer_path(user_answers.first.id) if user_answers.all?(&:save!)
-      rescue ActiveRecord::RecordInvalid => e
-        flash.now[:error] << e.record.errors.full_messages
+      if is_saved
+        redirect_to edit_user_answer_path(first_id)
+      else
+        flash.now[:error] << e_message
         render :new
       end
     end

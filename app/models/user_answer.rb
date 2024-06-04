@@ -33,7 +33,11 @@ class UserAnswer < ApplicationRecord
       user_answers << user_answer
     end
 
-    user_answers
+    begin
+      return true, user_answers.first.id, nil if user_answers.all?(&:save!)
+    rescue ActiveRecord::RecordInvalid => e
+      return false, nil, e.record.errors.full_messages
+    end
   end
 
   # 合否判定して、正解数と合否結果と保存の成否を返す
