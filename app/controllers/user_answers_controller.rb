@@ -41,20 +41,21 @@ class UserAnswersController < ApplicationController
 
   # 回答欄テーブルのchoiced_ansカラムの更新準備
   def edit
-    @user_answer = UserAnswer.get_user_answer(params[:id])
+    @user_answer = UserAnswer.get_by_id(params[:id])
 
-    # セッションユーザーと回答者が異なる場合、トップページへリダイレクト
-    flash.now[:error] = '他のユーザーの回答は編集できません。'if @user_answer.user_id != session[:user_id]
-    redirect_to root_path if @user_answer == nil || @user_answer.user_id != session[:user_id]
-
-    # すでに回答している問題の場合、その選択肢を選択済みにする
-    @choiced_ans_yes = @user_answer.choiced_ans == 'yes' ? true : false
-    @choiced_ans_no = @user_answer.choiced_ans == 'no' ? true : false
+    if @user_answer.nil? || !@user_answer.belongs_to_user?(session[:user_id])
+      # セッションユーザーと回答者が異なる場合、トップページへリダイレクト
+      flash.now[:error] = '他のユーザーの回答は編集できません。'
+      redirect_to root_path
+    else
+      # すでに回答している問題の場合、その選択肢を選択済みにする
+      @choiced_ans_yes, @choiced_ans_no = @user_answer.get_choiced_ans_flags
+    end
   end
 
   # 回答欄テーブルのchoiced_ansカラムの更新
   def update
-    @user_answer = UserAnswer.get_user_answer(params[:id])
+    @user_answer = UserAnswer.get_by_id(params[:id])
     if params[:user_answer] == nil
       flash.now[:error] = '「はい」か「いいえ」のどちらかを選択してください。'
       # 同じ問題番号の画面を再表示
