@@ -5,11 +5,13 @@ class SessionsController < ApplicationController
     if (user = User.find_or_create_from_auth_hash(auth_hash))
       log_in user
     end
+    flash[:notice] = 'ログインしました。'
     redirect_to root_path
   end
 
   def destroy
     log_out
+    flash[:notice] = 'ログアウトしました。'
     redirect_to root_path
   end
 

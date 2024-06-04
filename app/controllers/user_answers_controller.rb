@@ -57,24 +57,28 @@ class UserAnswersController < ApplicationController
     @user_answer = UserAnswer.get_user_answer(params[:id])
     if params[:user_answer] == nil
       flash.now[:error] = '「はい」か「いいえ」のどちらかを選択してください。'
-      render :edit  # 同じ問題番号の画面を再表示
+      # 同じ問題番号の画面を再表示
+      render :edit
       return
     end
     @user_answer.choiced_ans = params[:user_answer][:choiced_ans]
 
     begin
       if @user_answer.save  # 保存に成功した場合
-        # 最大、すなわち最終問題か
+        # 最大、すなわち最終問題かを確認
         if @user_answer.question_num == UserAnswer.get_question_num_all(session[:user_id], :question_num)
-          flash[:notice] = '回答が完了したら、提出してください。'
-          redirect_to user_answers_submit_path  # 提出確認画面へ
+          flash[:notice] = '回答が完了したら提出してください。または、第1問目から選択しなおすこともできます。'
+          # 提出確認画面へ
+          redirect_to user_answers_submit_path
         else  # 最終問題でない場合
-          redirect_to edit_user_answer_path(@user_answer.id + 1)  # 次の問題へ
+          # 次の問題へ
+          redirect_to edit_user_answer_path(@user_answer.id + 1)
         end
       end
     rescue ActiveRecord::RecordInvalid => e
       flash.now[:error] = e.record.errors.full_messages
-      render :edit  # 同じ問題番号の画面を再表示
+      # 同じ問題番号の画面を再表示
+      render :edit
     end
   end
 
