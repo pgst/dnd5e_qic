@@ -1,6 +1,7 @@
 class UserAnswer < ApplicationRecord
   belongs_to :user
   belongs_to :examination
+  delegate :question_txt, to: :examination, prefix: false
 
   # ユーザーのquestion_numが1以上のレコードを取得
   scope :get_user_answers, ->(user_id) { where(user_id:, question_num: 1..).order(:question_num) }
