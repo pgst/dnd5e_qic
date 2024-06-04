@@ -52,6 +52,7 @@ group :development do
 
   # 今回のapp用に追加
   gem "pry-rails"
+  gem "rails_best_practices"
 end
 
 group :test do
