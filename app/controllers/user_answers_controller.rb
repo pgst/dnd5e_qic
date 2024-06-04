@@ -16,7 +16,7 @@ class UserAnswersController < ApplicationController
     # セッションユーザーのID
     user_id = session[:user_id]
     # 問題数
-    question_num_all = params[:question_num_all].to_i
+    question_num_all = user_answer_params[:question_num_all].to_i
     # 解答欄テーブルからセッションユーザーの受験回数を取得
     attempts_num = UserAnswer.get_attempts_num(user_id)
 
@@ -99,5 +99,9 @@ class UserAnswersController < ApplicationController
 
   def set_no_cache
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+  end
+
+  def user_answer_params
+    params.permit(:question_num_all)
   end
 end
