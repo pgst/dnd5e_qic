@@ -15,25 +15,34 @@ class UserAnswersController < ApplicationController
   def create
     # セッションユーザーのID
     user_id = session[:user_id]
+
     # 問題数
-    question_num_all = user_answer_params[:question_num_all].to_i
+    question_num_all = params[:question_num_all].to_i
+
     # 解答欄テーブルからセッションユーザーの受験回数を取得
     attempts_num = UserAnswer.get_attempts_num(user_id)
 
-    # 提出前のレコードの有無を確認
+    # 提出前のレコード
     user_answers = UserAnswer.get_user_answers(user_id)
+
+    # 提出前のレコードの有無を確認
     if user_answers.present?
       # 通知
       flash[:notice] = '答案提出前の問題があります。再表示しますので回答してください。'
+      # 第1問目の画面へリダイレクト
       redirect_to edit_user_answer_path(user_answers.first.id)
     else
-      # 回答欄データを作成して保存
-      is_saved, first_id, e_messages = UserAnswer.set_user_answers(question_num_all, user_id, attempts_num)
+      # 回答欄データを新規作成して保存
+      is_saved, id_first, err_messages = UserAnswer.set_user_answers(question_num_all, user_id, attempts_num)
 
+      # 保存の成否
       if is_saved
-        redirect_to edit_user_answer_path(first_id)
+        # 第1問目の画面へリダイレクト
+        redirect_to edit_user_answer_path(id_first)
       else
-        flash.now[:error] << e_messages
+        # 通知
+        flash.now[:error] << err_messages
+        # 最初の確認画面へ戻す
         render :new
       end
     end
