@@ -15,36 +15,21 @@ class UserAnswersController < ApplicationController
   def create
     # セッションユーザーのID
     user_id = session[:user_id]
+    user_answer_params = params.permit(:question_num_all)
 
-    # 問題数
-    question_num_all = params[:question_num_all].to_i
+    # 提出前のレコードの確認と作成
+    is_saved, id, flash_messages = UserAnswer.review_and_create(user_id, user_answer_params[:question_num_all].to_i)
 
-    # 解答欄テーブルからセッションユーザーの受験回数を取得
-    attempts_num = UserAnswer.get_attempts_num(user_id)
-
-    # 提出前のレコード
-    user_answers = UserAnswer.get_user_answers(user_id)
-
-    # 提出前のレコードの有無を確認
-    if user_answers.present?
+    if is_saved
       # 通知
-      flash[:notice] = '答案提出前の問題があります。再表示しますので回答してください。'
-      # 第1問目の画面へリダイレクト
-      redirect_to edit_user_answer_path(user_answers.first.id)
+      flash[:notice] << flash_messages if flash_messages.present?
+      # 選択肢提示画面へリダイレクト
+      redirect_to edit_user_answer_path(id)
     else
-      # 回答欄データを新規作成して保存
-      is_saved, id_first, err_messages = UserAnswer.set_user_answers(question_num_all, user_id, attempts_num)
-
-      # 保存の成否
-      if is_saved
-        # 第1問目の画面へリダイレクト
-        redirect_to edit_user_answer_path(id_first)
-      else
-        # 通知
-        flash.now[:error] << err_messages
-        # 最初の確認画面へ戻す
-        render :new
-      end
+      # 通知
+      flash.now[:error] << flash_messages if flash_messages.present?
+      # 開始確認画面へ戻す
+      render :new
     end
   end
 
@@ -113,9 +98,5 @@ class UserAnswersController < ApplicationController
 
   def set_no_cache
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-  end
-
-  def user_answer_params
-    params.permit(:question_num_all)
   end
 end
