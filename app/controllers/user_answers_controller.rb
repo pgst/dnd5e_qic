@@ -16,6 +16,7 @@ class UserAnswersController < ApplicationController
     # 提出前のレコードの確認と作成
     is_saved, id, flash_messages = UserAnswer.review_and_create(user_id, user_answer_params[:question_num_all].to_i)
 
+    # 保存の成否を確認
     if is_saved
       # 通知
       flash[:notice] << flash_messages if flash_messages.present?
@@ -55,6 +56,7 @@ class UserAnswersController < ApplicationController
 
     is_saved, e_messages = @user_answer.update_choiced_ans(params[:user_answer])
 
+    # 保存の成否を確認
     if is_saved
       # 最終問題かを確認
       if @user_answer.is_last_question?(session[:user_id])
