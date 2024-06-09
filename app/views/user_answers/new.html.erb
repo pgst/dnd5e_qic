@@ -11,8 +11,8 @@
         </p>
         <p>
           現在のところ、問題数は全<%= @examination_count %>問です。<br />
-          その中から<%= @question_num_all %>問がランダムに出題されます。<br />
-          <%= @passing_score_threshold %>問以上の正解で合格です。
+          その中から<%= question_num_all %>問がランダムに出題されます。<br />
+          <%= passing_score_threshold %>問以上の正解で合格です。
         </p>
         <div class="d-grid gap-2 mx-auto">
           <%= form_with(url: user_answers_path, method: :post, local: true) do |form| %>

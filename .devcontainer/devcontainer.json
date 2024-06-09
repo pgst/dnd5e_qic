@@ -11,7 +11,8 @@
         "mhutchie.git-graph",
         "ecmel.vscode-html-css",
         "Shopify.ruby-extensions-pack",
-        "alexcvzz.vscode-sqlite"
+        "alexcvzz.vscode-sqlite",
+        "seatonjiang.gitmoji-vscode"
       ]
     }
   },
