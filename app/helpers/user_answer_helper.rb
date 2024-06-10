@@ -1,4 +1,5 @@
 module UserAnswerHelper
+  # 全問題数を設定
   def question_num_all
     return ENV['QUESTION_NUM_ALL'].to_i
   end
